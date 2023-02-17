@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
+use SimpleXMLElement;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Response;
 
 class WeatherController extends Controller
 {
@@ -14,16 +15,35 @@ class WeatherController extends Controller
      */
     public function getWeather(string $city)
     {
-        $response = Http::get('api.openweathermap.org/data/2.5/weather?q=' . $city . '&APPID=' .env('ONEWEATHERWAPP_API_KEY') . '&mode=xml');
+        $response = Http::get('api.openweathermap.org/data/2.5/weather?q=' . $city . '&APPID=' . env('ONEWEATHERWAPP_API_KEY'));
 
-        if ($response->ok()) {
-            $data = $response;
+        $data = $response->json();
 
-            return response($data, 200)->header('Content-Type', 'application/xml');
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><root></root>');
+
+        if ($response->status() == 200) {
+
+            function arraytoXML($data, &$xml)
+            {
+                foreach ($data as $key => $value) {
+                    if (is_int($key)) {
+                        $key = 'element' . $key;
+                    }
+                    if (is_array($value)) {
+                        $label = $xml->addChild($key);
+                        arrayToXml($value, $label);
+                    } else {
+                        $xml->addChild($key, $value);
+                    }
+                }
+            }
+
+            arraytoXML($data, $xml);
+
+            return Response::make($xml->asXML(), 200, ['Content-Type' => 'application/xml']);
+
+        } else {
+            return $data;
         }
-
-        $data = response()->json(['status' => false, 'message' => 'Unable to find city.']);
-
-        return $data;
     }
 }
