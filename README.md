@@ -15,3 +15,7 @@ php artisan serve
 ```
 http://127.0.0.1:8000/city/{city name}
 ```
+5. Got to address to use Open Weather Map API with front-end
+```
+http://127.0.0.1:8000/
+```

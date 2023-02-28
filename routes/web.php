@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [WeatherController::class, 'index']);
 
-Route::get('/city/{city}', [WeatherController::class, 'getWeather']);
+Route::get('/city/{city}', [WeatherController::class, 'getWeatherAPI']);
+
+Route::get('/weather-form', [WeatherController::class, 'submitCity'])->name('home.weatherForm');

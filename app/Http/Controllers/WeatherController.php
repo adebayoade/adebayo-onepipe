@@ -7,14 +7,26 @@ use SimpleXMLElement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Response;
 
 class WeatherController extends Controller
 {
     /**
-     * Get weather from the Openmapweather API.
+     * Returns the home view file.
      */
-    public function getWeather($city)
+    public function index(Request $request)
+    {
+        $data = $this->getWeather($request);
+
+        return view('home')->with('data', $data);
+    }
+    /**
+     * Get weather from the Openmapweather API.
+     * using the route parameter
+     * returns an XML
+     */
+    public function getWeatherAPI($city)
     {
         try {
             $response = Http::post('api.openweathermap.org/data/2.5/weather?q=' . $city . '&APPID=' . env('ONEWEATHERWAPP_API_KEY') . '&units=metric');
@@ -47,5 +59,38 @@ class WeatherController extends Controller
             }
         }
         return $xml;
+    }
+
+    /**
+     * handles the city input form
+     */
+    public function submitCity(Request $request)
+    {
+
+        $data = $this->getWeather($request);
+        return view('home')->with('data', $data);
+    }
+    /**
+     * Get weather from the Openmapweather API
+     * returns weather details array
+     */
+    public function getWeather(Request $request)
+    {
+        $city = $request->query('city', 'lagos');
+
+        try {
+            $response = Http::withHeaders([
+                'method' => 'GET',
+                'parameter' => [
+                    'units' => 'metrics',
+                ]
+            ])->post('http://api.openweathermap.org/data/2.5/weather?q=' . $city . '&APPID=' . env('ONEWEATHERWAPP_API_KEY') . '&units=metric');
+
+            $data = $response->json();
+
+            return $data;
+        } catch (Exception $e) {
+            return "Error connecting to API";
+        }
     }
 }
