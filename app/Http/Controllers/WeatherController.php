@@ -18,7 +18,14 @@ class WeatherController extends Controller
     public function index(Request $request)
     {
         $data = $this->getWeather($request);
-
+        return view('home')->with('data', $data);
+    }
+    /**
+     * handles the city input form
+     */
+    public function submitCity(Request $request)
+    {
+        $data = $this->getWeather($request);
         return view('home')->with('data', $data);
     }
     /**
@@ -45,7 +52,7 @@ class WeatherController extends Controller
     /**
      * Converts an Array to XML
      */
-    public function arrayToXML($data, $xml)
+    public function arrayToXML($data, SimpleXMLElement $xml)
     {
         foreach ($data as $key => $value) {
             if (is_int($key)) {
@@ -59,16 +66,6 @@ class WeatherController extends Controller
             }
         }
         return $xml;
-    }
-
-    /**
-     * handles the city input form
-     */
-    public function submitCity(Request $request)
-    {
-
-        $data = $this->getWeather($request);
-        return view('home')->with('data', $data);
     }
     /**
      * Get weather from the Openmapweather API
@@ -87,7 +84,7 @@ class WeatherController extends Controller
             ])->post('http://api.openweathermap.org/data/2.5/weather?q=' . $city . '&APPID=' . env('ONEWEATHERWAPP_API_KEY') . '&units=metric');
 
             $data = $response->json();
-
+            // dd($data);
             return $data;
         } catch (Exception $e) {
             return "Error connecting to API";

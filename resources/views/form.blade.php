@@ -1,3 +1,8 @@
+@php
+    use Carbon\Carbon;
+    $dt = Carbon::today();
+@endphp
+
 <div class="text-white mt-5">
     <div class="row justify-content-between">
         <form class="mt-5 col-sm-12 col-md-6 form p-3" method="GET" action="{{ route('home.weatherForm') }}">
@@ -18,7 +23,7 @@
                             <h2>{{ $data['main']['temp'] }} &deg;C</h2>
                             <p>{{ $data['weather'][0]['description'] }}</p>
                             <p>{{ $data['sys']['country'] }}</p>
-                            {{-- <p>{{ $getDate }}</p> --}}
+                            <p>{{ $dt->toDateString() }}</p>
                         </div>
                         <div id="icon"><img id="wicon" width="80"
                                 src="http://openweathermap.org/img/w/{{ $data['weather'][0]['icon'] }}.png"
@@ -34,7 +39,6 @@
                             <h2>&deg;C</h2>
                             <p></p>
                             <p></p>
-                            {{-- <p>{{ $getDate }}</p> --}}
                         </div>
                         <div id="icon"><img id="wicon" width="80" src="" alt="" />
                         </div>
